@@ -35,8 +35,8 @@ Your trained model is saved into database. Therefore you can edit your model and
 
 - Clone the repository
   ```shell
-  git clone https://github.com/EliasLucky/Edu-Web-Platform.git
-  cd Edu-Web-Platform
+  git clone https://github.com/EliasLucky/AI-Constructor.git
+  cd AI-Constructor
   ```
 - Setup and run the Docker container
   ```shell
