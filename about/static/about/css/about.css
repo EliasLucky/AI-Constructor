@@ -1,0 +1,116 @@
+*{
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	text-decoration: none;
+}
+
+@font-face {
+	font-family: "Nasa";
+	src: url("/static/homepage/fonts/nasalization-rg.otf")
+}
+
+.body {
+	position: relative;
+}
+
+.header {
+	position: absolute;
+	top: 0;
+	width: 100%;
+	height: 80px;
+	display: block;
+	background-color: black;
+}
+
+.inner-header {
+	height: 100%;
+	width: 1150px;
+	display: block;
+	margin: 0 auto;
+}
+
+.name {
+	height: 100%;
+	display: table;
+	float: left;
+}
+
+.name a {
+	font-size: 32px;
+	display: table-cell;
+	vertical-align: middle;
+	font-family: "Nasa";
+	color: white;
+}
+
+.pages {
+	height: 100%;
+	float: right;
+}
+
+.pages a {
+	height: 100%;
+	display: table;
+	float: left;
+	padding: 0px 20px;
+}
+
+.pages a:hover {
+	transition: 0.3s ease;
+	transform: scale(1.2) perspective(1px);
+}
+
+.pages a:active {
+	transition: 0.3s ease;
+	transform: scale(0.8) perspective(1px);
+}
+
+.pages a li {
+	display: table-cell;
+	vertical-align: middle;
+	height: 100%;
+	font-family: "Nasa";
+	color: white;
+	font-size: 20px;
+}
+
+.content {
+	display: flex;
+	vertical-align: middle;
+	text-align: center;
+	justify-content: center;
+	flex-direction: column;
+
+	width: 100%;
+	height: 100vh;
+
+	background: url("/static/systems/images/splash-screen-background4.jpg");
+	background-size: cover;
+	background-position: cover;
+	background-repeat: no-repeat;
+}
+
+.about {
+	margin-top: 80px;
+	text-align: center;
+	color: white;
+}
+
+.about-video {
+	margin: 0 auto;
+	margin-top: 20px;
+
+	width: 500px;
+
+	border: 1px solid white;
+	border-radius: 5px;
+}
+
+.about-videos {
+	display: flex;
+	vertical-align: middle;
+	text-align: center;
+	justify-content: space-between;
+	flex-direction: row;
+}
