@@ -1,0 +1,907 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Machine Learning Training</title>
+	<link rel="stylesheet" type="text/css" href="{% static 'api/css/control6.css' %}">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/101/three.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/17.2.0/Tween.min.js"></script>
+	<script src="https://tensorspace.org/assets/jslib/TrackballControls.js"></script>
+	<script src="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow/dist/drawflow.min.js"></script>
+	<!--<script src="https://cdn.jsdelivr.net/npm/three@1.0.1/examples/jsm/"></script>-->
+
+	<!--<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>-->
+	<!--<script src="https://cdn.jsdelivr.net/npm/three@latest/examples/js/controls/TrackballControls.js"></script>-->
+	
+	<!--<script type="importmap">
+	{
+		"imports": {
+			"tensorspace":
+				"https://cdn.jsdelivr.net/npm/tensorspace@latest/dist/tensorspace.min.js"
+		}
+	}
+	</script>-->
+	<!--<script src="https://cdn.jsdelivr.net/npm/tensorspace@0.6.0/dist/tensorspace.min.js"></script>-->
+
+	<script type="module" src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>
+	<!--<script type="module" src="{% static 'mlapi/js/chart4.js' %}"></script>-->
+	<script type="module" src="{% static 'api/js/control.js' %}"></script>
+	<!--<script type="module" src="{% static 'mlapi/js/chart4.js' %}"></script>-->
+</head>
+<body>
+	<div class="header">
+		<div class="inner-header">
+			<div class="name">
+				<a href="{% url 'homepage' %}">
+					AI Constructor
+				</a>
+			</div>
+
+			<ul class="pages">
+				<a class="button" href="{% url 'homepage' %}"><li>Home</li></a>
+				<a class="button" href="{% url 'classify' %}"><li>Classify</li></a>
+				<a class="button" href="{% url 'sandbox' %}"><li>Sandbox (Build your AI)</li></a>
+				<a class="button" href="{% url 'about'} %"><li>About</li></a>
+			</ul>
+		</div>
+	</div>
+
+	{% csrf_token %}
+	<input type="hidden" name="current-model-id" style="display: none;" value="">
+
+	<div class="container" id="container">
+		<header class="container-header">
+			<div class="row">
+				<div class="card col-md-3">
+					<div class="card-body">
+						<h5>Accuracy</h5>
+						<p id="accuracy-value">0.000</p>
+					</div>
+				</div>
+				<div class="card col-md-3">
+					<div class="card-body">
+						<h5>Loss</h5>
+						<p id="loss-value">0.000</p>
+					</div>
+				</div>
+				<div class="card col-md-3">
+					<div class="card-body">
+						<h5>Precision</h5>
+						<p id="precision-value">0.000</p>
+					</div>
+				</div>
+				<div class="card col-md-3">
+					<div class="card-body">
+						<h5>Recall</h5>
+						<p id="recall-value">0.000</p>
+					</div>
+				</div>
+			</div>
+		</header>
+		<aside class="sidebar" id="sidebar">
+			<div class="hyperparam-section purple-border-primary">
+				<div class="complex-accent">
+					<span class="complex-accent-span"></span>
+					<span class="complex-accent-span-2"></span>
+				</div>
+				<h3>Regularization</h3>
+				<div class="form-check">
+					<input type="checkbox" name="use_reg" class="form-check-input">
+					<label class="form-check-label">Use L2 Regularization</label>
+				</div>
+				<div class="form-group">
+					<label>L2 Lambda</label>
+					<input type="number" step="0.0001" name="l2_reg" value="0.001" class="form-control">
+				</div>
+				<div class="form-check">
+					<input type="checkbox" name="use_batchnorm" class="form-check-input">
+					<label class="form-check-label">Use Batch Normalization</label>
+				</div>
+			</div>
+			<div class="hyperparam-section purple-border-primary">
+				<div class="complex-accent">
+					<span class="complex-accent-span"></span>
+					<span class="complex-accent-span-2"></span>
+				</div>
+				<h3>Optimizer</h3>
+				<div class="form-group">
+					<label>Optimizer</label>
+					<select name="optimizer" class="form-control" id="optimizer">
+						<option value="adam">Adam</option>
+						<option value="rmsprop">RMSprop</option>
+						<option value="sgd">SGD</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label>Learning Rate</label>
+					<input type="number" step="0.0001" name="learning_rate" value="0.001" class="form-control">
+				</div>
+
+				<div class="optimizer-params" id="adam-params">
+					<div class="form-group">
+						<label>Beta 1</label>
+						<input type="number" step="0.01" name="beta_1" value="0.9" class="form-control">
+					</div>
+					<div class="form-group">
+						<label>Beta 2</label>
+						<input type="number" step="0.01" name="beta_2" value="0.99" class="form-control">
+					</div>
+				</div>
+
+				<div class="optimizer-params" id="sgd-params" style="display: none;">
+					<div class="form-group">
+						<label>Momentum</label>
+						<input type="number" step="0.01" name="momentum" value="0.9" class="form-control">
+					</div>
+					<div class="form-check">
+						<input type="checkbox" name="use_nesterov" class="form-check-input">
+						<label class="form-check-label">Use Nesterov Momentum</label>
+					</div>
+				</div>
+			</div>
+			<div class="hyperparam-section purple-border-primary">
+				<div class="complex-accent">
+					<span class="complex-accent-span"></span> 
+					<span class="complex-accent-span-2"></span>
+				</div>
+				<h3>Training</h3>
+				<div class="form-group">
+					<label>Epochs</label>
+					<input type="number" name="epochs" min="1" max="200" value="30" class="form-control">
+				</div>
+				<div class="form-group">
+					<label>Batch Size</label>
+					<input type="number" name="batch_size" min="8" max="256" value="32" class="form-control">
+				</div>
+				<div class="form-group">
+					<label>Validation Split</label>
+					<input type="number" step="0.01" min="0.05" max="0.5" name="val_split" value="0.2" class="form-control">
+				</div>
+			</div>
+		</aside>
+		<main id="canvas" style="position: relative;">
+			<!--<div class="canvas-video">
+				<video loop muted autoplay class="canvas-video">
+					<source src="{% static 'homepage/videos/exoplanets_bg3.mp4' %}">
+				</video>
+			</div>-->
+			<!--<div class="training-info">
+				<p>Training: <span id="current-epoch"></span>/<span id="total-epochs"></span></p>
+			</div>-->
+			<!--<div class="main-header">
+
+			</div>
+			<div class="content">
+				
+			</div>-->
+		</main>
+		<aside class="sidebar-training">
+			<div class="hyperparam-section purple-border-primary">
+				<div class="complex-accent">
+					<span class="complex-accent-span"></span>
+					<span class="complex-accent-span-2"></span>
+				</div>
+				<h3>Training Data</h3>
+				<div class="form-group">
+					<label>Training Data (CSV)</label>
+					<p>Training data must include: pl_orbper, pl_trandur, pl_rade, pl_bmasse, st_teff, st_rad, st_mass, sy_dist and tfopwg_disp.</p>
+					<p>Note: tfopwg_disp column is assigned with 1 of values: 'CP' (Confirmed Planet), 'PC' (Planetary Candidate) and 'FP' (False Positive)</p>
+					<p>If no training data was provided, then the default datasets from NASA Exoplanet Archive TOI and Kepler Missions will be used.</p>
+					<input type="file" id="training_data" name="training-data" class="form-control-file">
+				</div>
+			</div>
+			<!--<div class="hyperparam-section purple-border-primary">-->
+				<button class="btn btn-primary" id="train" onclick="startAdvancedTraining()">Start Training</button>
+			<!--</div>-->
+			<div class="hyperparam-section purple-border-primary">
+				<div class="complex-accent">
+					<span class="complex-accent-span"></span>
+					<span class="complex-accent-span-2"></span>
+				</div>
+				<h3>Exoplanets Classifier</h3>
+				<div class="form-group" id="predict">
+					<label>Upload Observation Data (CSV)</label>
+					<input type="file" name="datafile" class="form-control-file" id="classification">
+
+					<p style="margin-top: 0px;">Current selected model: <span id="current-model"></span></p>
+				
+					<button class="btn btn-primary" onclick="startPredicting()">Classify Exoplanets</button>
+				</div>
+
+				<h3>Classification Results</h3>
+				<div class="form-group" style="display: flex;" id="classification-results-spec">
+					<button class="btn btn-primary">View Classified</button>
+					<p style="margin-left: 10px;" id="classification-check"></p>
+				</div>
+			</div>
+		</aside>
+		<aside class="layers" id="layers">
+			
+		</aside>
+	</div>
+
+	<div class="container-window" id="container-window" style="display: none;">
+		<div class="row">
+			<div class="card col-md-3 mt-3" style="width: 100%;">
+				<div class="card-body card-return" id="close-container-window">
+					<p>Return back to studio</p>
+					<!--<button onclick="closeContainerWindow()">Close this window</button>-->
+				</div>
+			</div>
+		</div>
+
+		<ul class="nav nav-tabs" id="trainingTabs">
+			<li class="nav-item">
+				<a class="nav-link active" data-toggle="tab" href="#current-run">Current Run</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" data-toggle="tab" href="#comparison">Model Comparison</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" data-toggle="tab" href="#history">Training History</a>
+			</li>
+		</ul>
+
+		<div class="tab-content purple-border-primary">
+			<div class="complex-accent">
+				<span class="complex-accent-span"></span>
+				<span class="complex-accent-span-2"></span>
+				<span class="complex-accent-span-3"></span>
+				<span class="complex-accent-span-4"></span>
+			</div>
+			<div class="tab-pane show" id="current-run" style="display: block;">
+				<div class="row">
+					<div class="col-md-6">
+						<canvas class="compare-chart" id="accuracy-chart" height="500" width="700"></canvas>
+					</div>
+					<div class="col-md-6">
+						<canvas class="compare-chart" id="loss-chart"></canvas>
+					</div>
+				</div>
+				<div class="mt-3" id="live-metrics">
+					<div class="row">
+						<div class="card col-md-3">
+							<div class="card-body">
+								<h5>Accuracy</h5>
+								<p id="accuracy-value">0.000</p>
+							</div>
+						</div>
+						<div class="card col-md-3">
+							<div class="card-body">
+								<h5>Loss</h5>
+								<p id="loss-value">0.000</p>
+							</div>
+						</div>
+						<div class="card col-md-3">
+							<div class="card-body">
+								<h5>Precision</h5>
+								<p id="precision-value">0.000</p>
+							</div>
+						</div>
+						<div class="card col-md-3">
+							<div class="card-body">
+								<h5>Recall</h5>
+								<p id="recall-value">0.000</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="tab-pane" id="comparison">
+				<div class="row mt-3" style="justify-content: space-evenly;">
+					<div class="col-md-6" style="width: 40%; align-items: top;">
+						<canvas class="compare-chart" id="compare-acc-chart"></canvas>
+					</div>
+
+					<div class="form-group">
+						<select multiple class="form-control model-select" id="model-select">
+						{% for run in training_runs %}
+							<option value="{{ run.id }}"> v{{ run.version }} - {{ run.created_at|date:"Y-m-d h:m:s" }} </option>
+						{% endfor %}
+						</select>
+					</div>
+
+					<div class="col-md-6" style="width: 40%;">
+						<canvas class="compare-chart" id="compare-loss-chart"></canvas>
+					</div>
+				</div>
+
+				<button class="btn btn-primary" onclick="compareModels()">Compare Selected</button>
+				<!--
+				<div class="row mt-3">
+					<div class="col-md-6">
+						<canvas class="compare-chart" id="compare-acc-chart"></canvas>
+					</div>
+					<div class="col-md-6">
+						<canvas class="compare-chart" id="compare-loss-chart"></canvas>
+					</div>
+				</div>-->
+
+				<div class="mt-3">
+					<h3>Metrics Comparison</h3>
+					<table class="table mt-3" id="metrics-table">
+						<thead>
+							<tr>
+								<th>Metric</th>
+								<th>Model 1</th>
+								<th>Model 2</th>
+								<th>Difference</th>
+							</tr>
+						</thead>
+						<tbody>
+
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="tab-pane" id="history">
+				<table class="table">
+					<thead>
+						<tr>
+							<th>Version</th>
+							<th>Date</th>
+							<th>Accuracy</th>
+							<th>Loss</th>
+							<th>Epochs</th>
+							<th>Dataset Size</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+					{% for run in training_runs %}
+						<tr class="model-row" data-run-id="{{ run.id }}">
+							<td>{{ run.version }}</td>
+							<td>{{ run.created_at|date:"Y-m-d h:m:s" }}</td>
+							<td>{{ run.metrics.accuracy|floatformat:4 }}</td>
+							<td>{{ run.metrics.loss|floatformat:4 }}</td>
+							<td>{{ run.hyperparameters.epochs }}</td>
+							<td>{{ run.dataset_size }}</td>
+							<td>
+								<button class="btn btn-sm btn-primary" style="width: 50px;" onclick="loadModel('{{ run.id }}')">Load</button>
+								<button class="btn btn-sm btn-secondary" style="width: 50px;" onclick="deleteModel('{{ run.id }}')">Delete</button>
+							</td>
+						</tr>
+					{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	
+	<div class="container-window" id="container-window-results" style="display: none;">
+		<div class="row">
+			<div class="card col-md-3 mt-3" style="width: 100%;">
+				<div class="card-body card-return" id="close-container-window-results">
+					<p>Return back to studio</p>
+					<!--<button onclick="closeContainerWindowResults()">Clonse this window</button>-->
+				</div>
+			</div>
+		</div>
+
+		<div class="predict-results">
+			<h3>Classification Results</h3>
+			<div id="classification-results">
+				<h4 style="text-align: center;">No classification results at the current moment. </h4>
+				<h4 style="text-align: center;">Please select the neural network model from the top window at the studio. Or create your own model, which will be selected automatically after training.</h4>
+			</div>
+		</div>
+	</div>
+
+	<!-- sandbox.html -->
+	<!--<div class="content">
+		{csrf_token %}
+	<div class="visualizer" id="">
+		<div class="training-progress" id="training-progress" style="display: none;">
+			<div class="progress-bar-outer">
+				<div class="progress-bar"></div>
+			</div>
+			Current epoch: <p id="current-epoch"></p>
+			Total epochs: <p id="total-epochs"></p>
+		</div>
+		<canvas class="" id="network-canvas" width="800" height="400" style="background-color: rgba(0,0,0,1); display: none;">
+
+		</canvas>
+	</div>
+
+	<div class="training-results" id="training-results">
+		
+	</div>
+
+	<div class="sandbox-mode-selector mb-4">
+		<div class="btn-group" role="group">
+			<button type="button" class="btn btn-primary active" id="simple-mode-btn">Simple Mode</button>
+			<button type="button" class="btn btn-secondary" id="advanced-mode-btn">Advanced Mode</button>
+		</div>
+	</div>
+
+	<script>
+		let model = new TSP.models.Sequential();
+	</script>-->
+
+	<!--<div id="simple-mode" class="sandbox-mode">-->
+		<!-- Simplified controls -->
+	<!--	<div class="card">
+			<div class="card-body">
+				<h4 class="card-title">Simple Configuration</h4>
+				<div class="form-group">
+					<label>Model Complexity</label>
+					<select class="form-control" name="model_complexity">
+						<option value="small">Small (32 neurons)</option>
+						<option value="medium" selected>Medium (64 neurons)</option>
+						<option value="large">Large (128 neurons)</option>
+						<option value="xlarge">Extra Large (256 neurons)</option>
+					</select>
+				</div>
+      
+				<div class="form-group">
+					<label>Learning Rate</label>
+					<input type="range" class="form-control-range" name="learning_rate" min="0.0001" max="0.01" step="0.0001" value="0.001">
+					<output class="ml-2">0.001**\</output>**
+				</div>
+      
+				<div class="form-group">
+					<label>Training Intensity</label>
+					<input type="range" class="form-control-range" name="training_intensity" min="1" max="100" value="50">
+					<output class="ml-2">50%</output>
+				</div>
+      
+				<button class="btn btn-primary" onclick="startSimpleTraining()">Start Training</button>
+			</div>
+		</div>
+	</div>-->
+
+
+
+<!--<div id="advanced-mode" class="container-fluid sandbox-mode">
+	<div class="container">-->
+		<!-- Training Form -->
+		<!--<div class="col-md-5">-->
+			<!-- Expanded hyperparameter controls -->
+<!--			<div class="hyperparam-section purple-border-primary">
+				<span class="line-1"></span>
+				<span class="line-2"></span>
+				<span class="line-3"></span>
+				<span class="line-4"></span>
+				<h3>Architecture</h3>
+				<div class="form-group">
+					<label>Number of Layers</label>
+					<input type="number" name="num_layers" min="1" max="5" value="2" class="form-control">
+				</div>-->
+        
+				<!-- Dynamic layer controls (JavaScript would generate these) -->
+				<!--<div class="layer-controls" id="layer-controls">-->
+					<!--<div class="layer-params">
+						<h5>Layer 1</h5>
+						<div class="form-group">
+							<label>Units</label>
+							<input type="number" name="layer_1_units" min="8" max="512" value="128" class="form-control">
+						</div>
+						<div class="form-group">
+							<label>Activation</label>
+							<select name="layer_1_activation" class="form-control">
+								<option value="relu">ReLU</option>
+								<option value="leaky_relu">Leaky ReLU</option>
+								<option value="tanh">Tanh</option>
+								<option value="sigmoid">Sigmoid</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label>Dropout Rate</label>
+							<input type="number" step="0.01" min="0" max="0.9" name="layer_1_dropout" value="0.3" class="form-control">
+						</div>
+					</div>-->
+				<!-- More layers would be added dynamically -->
+				<!--</div>-->
+				<!--<button class="btn btn-sm btn-outline-primary mt-2" onclick="addLayer()">
+					<i class="fas fa-plus"></i> Add Layer
+				</button>-->
+			<!--</div>
+      
+			<div class="hyperparam-section purple-border-primary">
+				<div class="complex-accent">
+					<span class="complex-accent-span"></span>
+					<span class="complex-accent-span-2"></span>
+					<div class="hyperparam-section-inner">
+						<h3>Regularization</h3>
+						<div class="form-check">
+							<input type="checkbox" name="use_reg" class="form-check-input">
+							<label class="form-check-label">Use L2 Regularization</label>
+							<p>If used then all Dense layers will have kernel regularier as L2</p>
+						</div>
+						<div class="form-group">
+							<label>L2 Lambda</label>
+							<input type="number" step="0.0001" name="l2_reg" value="0.001" class="form-control">
+						</div>
+						<div class="form-check">
+							<input type="checkbox" name="use_batchnorm" class="form-check-input">
+							<label class="form-check-label">Use Batch Normalization</label>
+						</div>
+					</div>
+				</div>
+			</div>
+      
+			<div class="hyperparam-section purple-border-primary">
+				<div class="complex-accent">
+					<span class="complex-accent-span"></span>
+					<span class="complex-accent-span-2"></span>
+					<span class="complex-accent-span-3"></span>
+					<span class="complex-accent-span-4"></span>
+				</div>
+					<h3>Optimizer</h3>
+					<div class="form-group">
+						<label>Optimizer</label>
+						<select name="optimizer" class="form-control" id="optimizer">
+							<option value="adam">Adam</option>
+							<option value="rmsprop">RMSprop</option>
+							<option value="sgd">SGD</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label>Learning Rate</label>
+						<input type="number" step="0.0001" name="learning_rate" value="0.001" class="form-control">
+					</div>-->
+        
+					<!-- Adam-specific params -->
+					<!--<div class="optimizer-params" id="adam-params">
+						<div class="form-group">
+							<label>Beta 1</label>
+							<input type="number" step="0.01" name="beta_1" value="0.9" class="form-control">
+						</div>
+						<div class="form-group">
+							<label>Beta 2</label>
+							<input type="number" step="0.01" name="beta_2" value="0.999" class="form-control">
+						</div>
+        			</div>-->
+        
+					<!-- SGD-specific params -->
+					<!--<div class="optimizer-params" id="sgd-params" style="display:none;">
+						<div class="form-group">
+							<label>Momentum</label>
+							<input type="number" step="0.01" name="momentum" value="0.9" class="form-control">
+						</div>
+						<div class="form-check">
+							<input type="checkbox" name="use_nesterov" class="form-check-input">
+							<label class="form-check-label">Use Nesterov Momentum</label>
+						</div>
+					</div>-->
+			<!--</div>-->
+      
+			<!-- Training parameters -->
+			<!--<div class="hyperparam-section purple-border-primary">
+				<div class="complex-accent">
+					<span class="complex-accent-span"></span>
+					<span class="complex-accent-span-2"></span>
+				</div>
+				<h3>Training</h3>
+				<div class="form-group">
+					<label>Epochs</label>
+					<input type="number" name="epochs" min="1" max="200" value="30" class="form-control">
+				</div>
+				<div class="form-group">
+					<label>Batch Size</label>
+					<input type="number" name="batch_size" min="8" max="256" value="32" class="form-control">
+				</div>
+				<div class="form-group">
+					<label>Validation Split</label>
+					<input type="number" step="0.01" min="0.05" max="0.5" name="val_split" value="0.2" class="form-control">
+				</div>
+			</div>-->
+      
+			<!-- Training data upload -->
+			<!-- <div class="form-group">
+				<label>Training Data (CSV)</label>
+				<p>Training data must include: pl_orbper, pl_trandur, pl_rade, pl_bmasse, st_teff, st_rad, st_mass, sy_dist and tfopwg_disp</p>
+				<p></p>
+				<p>If no Training Data was provided, then the default one from NASA Exoplanets Archive will be used.</p>
+				<input type="file" id="training_data" name="training_data" class="form-control-file">
+			</div>
+      
+			<button class="btn btn-primary" onclick="startAdvancedTraining()">Start Training</button>
+		</div>-->
+    
+		<!-- Visualization Area -->
+		<!--<div class="col-md-7">
+			<ul class="nav nav-tabs" id="trainingTabs">
+				<li class="nav-item">
+					<a class="nav-link active" data-toggle="tab" href="#current-run">Current Run</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" data-toggle="tab" href="#comparison">Model Comparison</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" data-toggle="tab" href="#history">Training History</a>
+				</li>
+			</ul>
+      
+			<div class="tab-content purple-border-primary">
+				<div class="complex-accent">
+					<span class="complex-accent-span"></span>
+					<span class="complex-accent-span-2"></span>
+				</div>-->
+				<!-- Current Run Tab -->
+			<!--	<div class="tab-pane fade show active" id="current-run">
+					<div class="row">
+						<div class="col-md-6">
+							<canvas class="compare-chart" id="accuracy-chart"></canvas>
+						</div>
+						<div class="col-md-6">
+							<canvas class="compare-chart" id="loss-chart"></canvas>
+						</div>
+					</div>
+					<div class="mt-3" id="live-metrics">
+						<div class="row">
+							<div class="col-md-3">
+								<div class="card">
+									<div class="card-body">
+										<h5>Accuracy</h5>
+										<p id="acc-value">0.000</p>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-3">
+								<div class="card">
+									<div class="card-body">
+										<h5>Loss</h5>
+										<p id="loss-value">0.000</p>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-3">
+								<div class="card">
+									<div class="card-body">
+										<h5>Precision</h5>
+										<p id="precision-value">0.000</p>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-3">
+								<div class="card">
+									<div class="card-body">
+										<h5>Recall</h5>
+										<p id="recall-value">0.000</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>-->
+        
+				<!-- Comparison Tab -->
+				<!--<div class="tab-pane fade" id="comparison">
+					<div class="form-group">
+						<h3>Select Models to Compare:</h3>
+						<select multiple class="form-control model-select" id="model-select">
+						{% for run in training_runs %}
+							<option value="{{ run.id }}">v{{ run.version }} - {{ run.created_at|date:"Y-m-d" }}</option>
+						{% endfor %}
+						</select>
+					</div>
+					<button class="btn btn-secondary" onclick="compareModels()">Compare Selected</button>
+          
+					<div class="row mt-3">
+						<div class="col-md-6">
+							<canvas class="compare-chart" id="compare-acc-chart"></canvas>
+						</div>
+						<div class="col-md-6">
+							<canvas class="compare-chart" id="compare-loss-chart"></canvas>
+						</div>
+					</div>
+          
+					<div class="mt-3">
+						<h5>Metrics Comparison</h5>
+						<table class="table table-bordered" id="metrics-table">
+							<thead>
+								<tr>
+									<th>Metric</th>
+									<th>Model 1</th>
+									<th>Model 2</th>
+									<th>Difference</th>
+								</tr>
+							</thead>
+							<tbody>-->
+							<!-- Filled dynamically -->
+				<!--			</tbody>
+						</table>
+					</div>
+				</div>-->
+        
+				<!-- Training History Tab -->
+				<!--<div class="tab-pane fade" id="history">
+					<table class="table table-striped">
+						<thead>
+							<tr>
+							<th>Version</th>
+							<th>Date</th>
+							<th>Accuracy</th>
+							<th>Loss</th>
+							<th>Epochs</th>
+							<th>Dataset Size</th>
+							<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+						{% for run in training_runs %}
+							<tr class="model-row" data-run-id="{{ run.id }}">
+								<td>v{{ run.version }}</td>
+								<td>{{ run.created_at|date:"Y-m-d h:m:s" }}</td>
+								<td>{{ run.metrics.accuracy|floatformat:4 }}</td>
+								<td>{{ run.metrics.loss|floatformat:4 }}</td>
+								<td>{{ run.hyperparameters.epochs }}</td>
+								<td>{{ run.dataset_size }}</td>
+								<td>
+									<button class="btn btn-sm btn-info" onclick="loadModel('{{ run.id }}')">Load</button>
+									<button class="btn btn-sm btn-danger" onclick="deleteModel('{{ run.id }}')">Delete</button>
+								</td>
+							</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+			</div>
+		</div>
+	</div>
+ 
+	<input type="hidden" name="current-model-id" style="display: none;" value="">
+
+	<div class="predict">
+		<h2>Exoplanet Classifier</h2>
+		<p>The last model above is selected for prediction. Additionally you can choose by pressing load on specific model.</p>
+		<p>Currently selected model:</p><span id="current-model"></span>-->
+		<!--<form method="post" enctype="multipart/form-data">-->
+		<!--	<div class="form-group">
+				<label>Upload Observation Data (CSV):</label>
+				<input type="file" name="datafile" class="form-control-file" id="classification" required>
+				<small class="form-text text-muted">
+					Must include: pl_orbper, pl_trandur, pl_rade, pl_bmasse,
+					st_teff, st_rad, st_mass, sy_dist
+				</small>
+			</div>
+			<button type="submit" class="btn btn-primary" onclick="startPredicting()">Classify Exoplanets</button>-->
+		<!--</form>-->
+
+		<!--<div class="predict-results">
+			<h3>Classification Results</h3>
+			<div id="classification-results">
+
+			</div>
+		</div>
+
+	</div>-->
+</div>
+
+
+
+
+
+
+
+
+<!--
+{ extends "base.html" %}
+
+{ block content %}
+<h2>Model Sandbox</h2>
+<form method="post" enctype="multipart/form-data" id="training-form">
+	{% csrf_token %}
+  
+	<div class="form-group">
+		<label>Training Data (CSV with labels):</label>
+		<input type="file" name="training_data" class="form-control-file">
+		<small class="form-text text-muted">
+			Must include disposition column (CONFIRMED/CANDIDATE/FALSE POSITIVE)
+		</small>
+	</div>
+  
+	<h4 class="mt-4">Hyperparameters</h4>
+	<div class="form-row">
+		<div class="form-group col-md-3">
+			<label>Learning Rate</label>
+			<input type="number" step="0.0001" name="learning_rate" value="{{ hyperparams.learning_rate }}" class="form-control">
+		</div>
+		<div class="form-group col-md-3">
+			<label>Batch Size</label>
+			<input type="number" name="batch_size" value="{{ hyperparams.batch_size }}" class="form-control">
+		</div>
+		<div class="form-group col-md-3">
+			<label>Epochs</label>
+			<input type="number" name="epochs" value="{{ hyperparams.epochs }}" class="form-control">
+		</div>
+		<div class="form-group col-md-3">
+			<label>Dropout Rate</label>
+			<input type="number" step="0.01" name="dropout_rate" value="{{ hyperparams.dropout_rate }}" class="form-control">
+		</div>
+	</div>
+  
+	<button type="submit" class="btn btn-warning">Retrain Model</button>
+</form>
+
+<div id="training-results" class="mt-4"></div>
+{ endblock %}
+
+{ block scripts %}-->
+<script>
+// AJAX form submission
+/*$('#training-form').submit(function(e) {
+	e.preventDefault();
+	const formData = new FormData(this);
+  
+	$.ajax({
+		url: "}",
+		type: 'POST',
+		data: formData,
+		processData: false,
+		contentType: false,
+		success: function(data) {
+			$('#training-results').html(data);
+      
+			// Render charts if available
+			if (data.history) {
+				renderTrainingCharts(JSON.parse(data.history));
+			}
+		}
+	});
+});
+
+function renderTrainingCharts(history) {
+  // Use Chart.js to render accuracy/loss charts
+  // Implementation would go here
+}*/
+/*
+function startTraining() {
+    // Disable form during training
+    $('#training-form :input').prop('disabled', true);
+    
+    // Show progress indicator
+    $('#training-results').html('<div class="text-center"><div class="spinner-border"></div><p>Training in progress...</p></div>');
+    
+    // Submit form via AJAX
+    const formData = new FormData($('#training-form')[0]);
+    $.ajax({
+        url: "{ url 'retrain_model' %}",
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            // Start polling for results
+            pollTrainingStatus(response.task_id);
+        }
+    });
+}
+
+function pollTrainingStatus(taskId) {
+    const pollInterval = setInterval(() => {
+        $.get(`/sandbox/status/${taskId}/`, function(response) {
+            if (response.status === 'SUCCESS') {
+                clearInterval(pollInterval);
+                showTrainingResults(response.result);
+                $('#training-form :input').prop('disabled', false);
+            } else if (response.status === 'FAILURE') {
+                clearInterval(pollInterval);
+                showTrainingError(response.result);
+                $('#training-form :input').prop('disabled', false);
+            }
+            // Otherwise continue waiting
+        });
+    }, 2000); // Check every 2 seconds
+}
+
+function showTrainingResults(results) {
+    // Display results to user
+    $('#training-results').html(`
+        <div class="alert alert-success">
+            <h4>Training Complete!</h4>
+            <p>Final Accuracy: ${(results.accuracy * 100).toFixed(2)}%</p>
+            <p>Validation Loss: ${results.loss.toFixed(4)}</p>
+        </div>
+    `);
+}*/
+</script>
+
+
+	</body>
+</html>

@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel='stylesheet' type='text/css' href="{% static 'homepage/css/index.css' %}">
+	<title>Homepage</title>
+</head>
+<body>
+	<div class="header" style="height: 50px; background: black;">
+		<div class="inner-header">
+			<div class="name">
+				<a href="{% url 'homepage' %}">
+					AI Constructor
+				</a>
+			</div>
+		
+				<a class="button" href="{% url 'homepage' %}"><li>Home</li></a>
+				<a class="button" href="{% url 'classify' %}"><li>Classify</li></a>
+				<a class="button" href="{% url 'sandbox' %}"><li>Sandbox <span style="font-size: 15px;">(BUILD YOUR AI)</span></li></a>
+				<a class="button" href="{% url 'about' %}"><li>About</li></a>
+			</ul>
+		</div>
+	</div>
+
+	<section id="home" style="justify-content: space-between;">
+		<h2 style="color: #73bbf1; margin-top: 150px;">AI Constructor</h2>
+		<div class="btn" style="margin-bottom: 150px;">
+			<a class="systems special" href="{% url 'classify' %}">
+				Classify
+			</a>
+			<a class="systems special" href="{% url 'sandbox' %}">
+				Sandbox
+			</a>
+		</div>
+		<div class="fullscreen-bg">
+			<video loop muted autoplay class="fullscreen-bg-video">
+				<source src="{% static 'homepage/videos/exoplanets_bg2.mp4' %}" type="video/mp4">
+			</video>
+		</div>
+	</section>
+
+	<div class="additional">
+		<p>Product made by Elias Lucky for NASA Space Apps Challenge 2025</p>
+	</div>
+</body>
+</html>

@@ -1,0 +1,112 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Exoplanet Classification</title>
+	<link rel="stylesheet" type="text/css" href="{% static 'api/css/control6.css' %}">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/101/three.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/17.2.0/Tween.min.js"></script>
+	<script src="https://tensorspace.org/assets/jslib/TrackballControls.js"></script>
+	<script type="module" src="{% static 'api/js/control.js' %}"></script>
+</head>
+<body>
+	<!--header-->
+	<div class="header">
+		<div class="inner-header">
+			<div class="name">
+				<a href="{% url 'homepage' %}">
+					AI Constructor
+				</a>
+			</div>
+			
+			<ul class="pages">
+				<a class="button" href="{% url 'homepage' %}"><li>Home</li></a>
+				<a class="button" href="{% url 'classify' %}"><li>Classify</li></a>
+				<a class="button" href="{% url 'sandbox' %}"><li>Sandbox (Build your AI)</li></a>
+			</ul>
+		</div>
+	</div>
+
+	<div class="content" style="background: black">
+		<main id="canvas">
+			<!--<div class="canvas-video" style="width: 100%; height: calc(100% - 20px)">
+				<video loop muted autoplay class="canvas-video">
+					<source src="{% static 'homepage/videos/exoplanets_bg3.mp4' %}">
+				</video>
+			</div>-->
+		</main>
+		<div class="content-container">
+			<div class="hyperparam-section purple-border-primary">
+				<div class="complex-accent">
+					<span class="complex-accent-span"></span>
+					<span class="complex-accent-span-2"></span>
+					<!--<span class="complex-accent-span-3"></span>
+					<span class="complex-accent-span-4"></span>-->
+				</div>
+				<h3>Exoplanet Classifier</h3>
+				<div class="form-group">
+					<form method="post" enctype="multipart/form-data">
+					{% csrf_token %}
+					<!--<div class="form-group">-->
+						<label>Upload Observation Data (CSV):</label>
+						<input type="file" name="datafile" class="form-control-file" required>
+						<p class="form-text text-muted">
+							Must include: pl_orbper, pl_trandur, pl_rade, pl_bmasse,
+							st_teff, st_rad, st_mass, sy_dist
+						</p>
+					<!--</div>-->
+						<button type="submit" class="btn btn-primary">Classify Exoplanets</button>
+					</form>
+				</div>
+
+				<h3>Classification Results</h3>
+				<div class="form-group">
+					<button class="btn btn-primary" id="classification-results">View Classified</button>
+				</div>
+			</div>
+
+		<!--{% if error %}
+		<div class="alert alert-danger mt3">{{ error }}</div>
+		{% endif %}
+
+		{% if result %}
+		<div class="mt-4">
+			<h3>Classification Results</h3>
+			{{ result|safe }}
+		</div>
+		{% endif %}
+
+		<div class="sandbox-link">
+			<h3>Want better model? Want to load more datasets and/or configure it?</h4>
+			<p>You can do this on the dedicated page - sandbox for all models.</p>
+			<a href="{% url 'sandbox' %}">Sandbox</a>
+		</div>-->
+		</div>
+		<div class="container-window" id="content-container-results" style="display: none;">
+			<div class="row">
+				<div class="card col-mt-3 mt-3" style="width: 100%">
+					<div class="card-body card-return" id="close-content-container-results">
+						<p>Return back to classifier</p>
+					</div>
+				</div>
+			</div>
+
+			<div class="predict-results">
+				<h3>Classification Results</h3>
+				{% if result %}
+				{{ result|safe }}
+				{% endif %}
+			</div>
+		</div>
+	</div>
+
+	<!--{% if result %}
+	<script>
+		
+	</script>
+	{% endif %}-->
+</body>
+</html>

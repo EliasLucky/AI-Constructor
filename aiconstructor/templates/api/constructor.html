@@ -1,0 +1,395 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>  </title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow/dist/drawflow.min.css">
+	<link rel="stylesheet" href="{% static 'api/css/control6 copy 4.css' %}">
+	<script src="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow/dist/drawflow.min.js"></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+	<script src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/101/three.min.js"></script>
+	<script src="https://tensorspace.org/assets/jslib/TrackballControls.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.js"></script>
+
+	<script type="module" src="{% static 'api/js/control.js' %}"></script>
+</head>
+<body id="constructors">
+	<div class="constructor" id="constructor" style="display: none;">
+		<div class="header">
+			<div class="inner-header">
+				<div class="name">
+					<p id="constructor-name"></p>
+				</div>
+
+				<ul class="pages">
+					<a class="button"><li> Close Control Panel </li></a>
+				</ul>
+			</div>
+		</div>
+
+		<div class="container">
+			<header class="container-header">
+				<div class="row">
+					<div class="card col-md-3">
+						<div class="card-body">
+							<h5>Accuracy</h5>
+							<p id="accuracy-value">0.000</p>
+						</div>
+					</div>
+					<div class="card col-md-3">
+						<div class="card-body">
+							<h5>Loss</h5>
+							<p id="loss-value">0.000</p>
+						</div>
+					</div>
+					<div class="card col-md-3">
+						<div class="card-body">
+							<h5>Precision</h5>
+							<p id="precision-value">0.000</p>
+						</div>
+					</div>
+					<div class="card col-md-3">
+						<div class="card-body">
+							<h5>Recall</h5>
+							<p id="recall-value">0.000</p>
+						</div>
+					</div>
+				</div>
+			</header>
+
+			<aside class="sidebar" id="sidebar">
+				<div class="hyperparam-section purple-border-primary">
+					<div class="complex-accent">
+						<span class="complex-accent-span"></span>
+						<span class="complex-accent-span-2"></span>
+					</div>
+					<h3>Regularization</h3>
+					<div class="form-check">
+						<input type="checkbox" name="use_reg" class="form-check-input">
+						<label class="form-check-label">Use L2 Regularization</label>
+					</div>
+					<div class="form-group">
+						<label>L2 Lambda</label>
+						<input type="number" step="0.0001" name="l2_reg" value="0.001" class="form-control">
+					</div>
+					<div class="form-check">
+						<input type="checkbox" name="use_batchnorm" class="form-check-input">
+						<label class="form-check-label">Use Batch Normalization</label>
+					</div>
+				</div>
+				<div class="hyperparam-section purple-border-primary">
+					<div class="complex-accent">
+						<span class="complex-accent-span"></span>
+						<span class="complex-accent-span-2"></span>
+					</div>
+					<h3>Optimizer</h3>
+					<div class="form-group">
+						<label>Optimizer</label>
+						<select name="optimizer" class="form-control" id="optimizer">
+							<option value="adam">Adam</option>
+							<option value="rmsprop">RMSprop</option>
+							<option value="sgd">SGD</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label> Learning Rate </label>
+						<input type="number" step="0.0001" name="learning_rate" value="0.001" class="form-control">
+					</div>
+					<div class="optimizer-params" id="adam-params">
+						<div class="form-group">
+							<label>Beta 1</label>
+							<input type="number" step="0.01" name="beta_1" value="0.9" class="form-control">
+						</div>
+						<div class="form-group">
+							<label>Beta 2</label>
+							<input type="number" step="0.01" name="beta_2" value="0.9" class="form-control">
+						</div>
+					</div>
+					<div class="optimizer-params" id="sgd-params" style="display: none;">
+						<div class="form-group">
+							<label>Momentum</label>
+						</div>
+						<div class="form-group">
+							<input type="checkbox" name="use_nesterov" class="form-check-input">
+							<label class="form-check-label">Use Nesterov Momentum</label>
+						</div>
+					</div>
+				</div>
+				<div class="hyperparam-section purple-border-primary">
+					<div class="complex-accent">
+						<span class="complex-accent-span"></span>
+						<span class="complex-accent-span-2"></span>
+					</div>
+					<h3>Training</h3>
+					<div class="form-group">
+						<label>Epochs</label>
+						<input type="number" name="epochs" min="1" max="200" value="30" class="form-control">
+					</div>
+					<div class="form-group">
+						<label>Batch Size</label>
+						<input type="number" name="batch_size" min="8" max="256" value="32" class="form-control">
+					</div>
+					<div class="form-group">
+						<label>Validation Split</label>
+						<input type="number" step="0.01" min="0.05" max="0.5" name="val_split" value="0.2" class="form-control">
+					</div>
+				</div>
+			</aside>
+
+			<main id="canvas" style="position: relative;" name="canvas">
+
+			</main>
+
+			<aside class="sidebar-training">
+				<div class="hyperparam-section purple-border-primary" id="columns">
+					<div class="complex-accent">
+						<span class="complex-accent-span"></span>
+						<span class="complex-accent-span-2"></span>
+					</div>
+					<h3>Training Data</h3>
+					<div class="form-group">
+					<label>Training Data (CSV)</label>
+					<p>Training data must include: <span id="input_columns"></span> and <span id="output_columns"></span> </p>
+					<!--
+					Dynamically created info about output
+					-->
+					<input type="file" id="training_data" name="training-data" class="form-control-file">
+					</div>
+				</div>
+				<button class="btn btn-primary" id="train" onclick="startComplexTraining()">Start Training</button>
+				<div class="hyperparam-section purple-border-primary">
+					<div class="complex-accent">
+						<span class="complex-accent-span"></span>
+						<span class="complex-accent-span-2"></span>
+					</div>
+					<h3>Exoplanets Classifier</h3>
+					<div class="form-group" id="predict">
+						<label>Upload Classification Data (CSV)</label>
+						<input type="file" name="datafile" class="form-control-file" id="classification">
+						<p>To start this model return back to the flow interface and press "Run" button.</p>
+					</div>
+
+					<h3>Classification Results</h3>
+
+				</div>
+			</aside>
+			<aside class="layers" name="layers">
+
+			</aside>
+		</div>
+
+		<div class="container-window" id="container-window" style="display: none;">
+			<div class="row">
+				<div class="card col-md-3 mt-3" style="width: 100%;">
+					<div class="card-body card-return" id="close-container-window">
+						<p>Return back to studio</p>
+					</div>
+				</div>
+			</div>
+
+			<ul class="nav nav-tabs" id="trainingTabs">
+				<li class="nav-item">
+					<a class="nav-link active" data-toggle="tab" href="#current-run">Current Run</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" data-toggle="tab" href="#comparison">Model Comparison</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" data-toggle="tab" href="#history">Training History</a>
+				</li>
+			</ul>
+
+			<div class="tab-content">
+				<div class="tab-pane show" id="current-run" style="display: block;">
+					<div class="row">
+						<div class="col-md-6">
+							<canvas class="compare-chart" id="accuracy-chart" height="500" width="700"></canvas>
+						</div>
+						<div class="col-md-6">
+							<canvas class="compare-chart" id="loss-chart"></canvas>
+						</div>
+					</div>
+					<div class="mt-3" id="live-metrics">
+						<div class="row">
+							<div class="card col-md-3">
+								<div class="card-body">
+									<h5>Accuracy</h5>
+									<p id="accuracy-value">0.000</p>
+								</div>
+							</div>
+							<div class="card col-md-3">
+								<div class="card-body">
+									<h5>Loss</h5>
+									<p id="loss-value">0.000</p>
+								</div>
+							</div>
+							<div class="card col-md-3">
+								<div class="card-body">
+									<h5>Precision</h5>
+									<p id="precision-value">0.000</p>
+								</div>
+							</div>
+							<div class="card col-md-3">
+								<div class="card-body">
+									<h5>Recall</h5>
+									<p id="recall-value">0.000</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="tab-pane" id="comparison">
+				<div class="row mt-3">
+					<div class="col-md-6" style="width: 40%; align-items: top;">
+						<canvas class="compare-chart" id="compare-acc-chart"></canvas>
+					</div>
+
+					<div class="form-group">
+						<select multiple class="form-control model-select" id="model-select">
+							{% for run in training_runs %}
+							<option value="{{ run.id }}"> v{{ run.version }} - {{ run.created_at|date:"Y-m-d h:m:s" }} </option>
+							{% endfor %}
+						</select>
+					</div>
+
+					<div class="col-md-6" style="width: 40%;">
+						<canvas class="compare-chart" id="compare-loss-chart"></canvas>
+					</div>
+				</div>
+				<button class="btn btn-primary" onclick="compareModels()">Compare Selected</button>
+
+				<div class="mt-3">
+					<h3>Metrics Comparison</h3>
+					<table class="table mt-3" id="metrics-table">
+						<thead>
+							<tr>
+								<th>Metric</th>
+								<th>Model 1</th>
+								<th>Model 2</th>
+								<th>Difference</th>
+							</tr>
+						</thead>
+						<tbody>
+
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<div class="tab-pane">
+				<table class="table">
+					<thead>
+						<tr>
+							<th>Version</th>
+							<th>Date</th>
+							<th>Accuracy</th>
+							<th>Loss</th>
+							<th>Epochs</th>
+							<th>Dataset Size</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+					{% for run in training_runs %}
+						<tr class="model-row" data-run-id="{{ run.id }}">
+							<td> {{ run.version }} </td>
+							<td> {{ run.created_at|date:"Y-m-d h:m:s" }} </td>
+							<td> {{ run.metrics.accuracy|floatformat:4 }} </td>
+							<td> {{ run.metrics.loss|floatformat:4 }} </td>
+							<td> {{ run.hyperparameters.epochs }} </td>
+							<td> {{ run.dataset_size }} </td>
+							<td>
+								<button class="btn btn-primary" style="width: 50px;" onclick="loadModel(event, '{{ run.id }}')"></button>
+								<button class="btn btn-primary" style="width: 50px;" onclick="deleteModel(event, '{{ run.id }}')"></button>
+							</td>
+						</tr>
+					{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<div class="container-window" id="container-window-results" style="display: none;">
+			<div class="row">
+				<div class="card col-md-3 mt-3">
+					<div class="card-body card-return" id="close-container-window-results">
+						<p>Return back to studio</p>
+					</div>
+				</div>
+			</div>
+
+			<div class="predict-results">
+				<h3>Classification Results</h3>
+				<div id="classification-results">
+					<h4 style="text-align: center;">No classification results at the current moment.</h4>
+					<h4 style="text-align: center;">Please select the neural network model from the top window at the studio. Or create your own model, which will be selected automatically after training.</h4>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="wrapper">
+	<div class="col">
+		<div class="draw-drawflow" draggable="true" ondragstart="drag(event)" data-node="end">
+			<i class="fab fa-end"></i><span>End</span>
+		</div>
+		<div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="neural-network">
+			<i class="fab fa-neural-network"></i><span>Neural Network</span>
+		</div>
+		<p>Logic</p>
+		<div class="drag-drawflow" draggable="true" ondragstart="drag(event)" data-node="ifelse">
+			<i class="fab fa-ifelse"></i><span>If Else</span>
+		</div>
+	</div>
+	<div class="col-right">
+	<div class="menu">
+		<ul>
+			<li onclick="editor.changeModule('Home'); changeModule(event);" class="selected">Home</li>
+			<li onclick="editor.changeModule('Other'); changeModule(event);">Other Module</li>
+		</ul>
+	</div>
+	<div class="canvas" id="drawflow" ondrop="drop(event)" ondragover="allowDrop(event)" style="width: 100vw; height: 100vh;">
+		<div class="btn-export" onclick="Swal.fire({ title: 'Export', html: '<pre><code>'+ JSON.stringify(editor.export(), null, 4) +'</code></pre>'})">Export</div>
+		<div class="btn-clean" onclick="editor.clearModuleSelected()">Clear</div>
+		<div class="btn-lock">
+			<i id="lock" class="fas fa-lock" onclick="editor.editor_mode='fixed'; changeMode('lock');"></i>
+			<i id="lock" class="fas fa-lock-open" onclick="editor.editor_mode='editor'; changeMode('unclock');" style="display: none;"></i>
+		</div>
+		<div class="bar-zoom">
+			<i class="fas fa-search-minus" onclick="editor.zoom_out()"></i>
+			<i class="fas fa-search" onclick="editor.zoom_reset()"></i>
+			<i class="fas fa-search-plus" onclick="editor.zoom_in()"></i>
+		</div>
+	</div>
+	</div>
+	</div>
+
+	<script>
+		/*function drag(event) {
+			if (event.type === "touchstart") {
+				mobile_item_selec = ev.target.closest(".drag-drawflow").getAttribute('data-node')
+			}
+			else {
+				event.dataTransfer.setData("node", event.target.getAttribute('data-node'))
+			}
+		}
+
+		function drop(event) {
+			if (event.type === "touchend") {
+				var parentdrawflow = document.elementFromPoint(mobile_last_move.touches[0].clientX, mobile_last_move.touches[0].clientY).closest("#drawflow");
+				if (parentdrawflow != null) {
+					add Node To Draw Flow(mobile_item_selec, mobile_last_move.touches[0]/)
+				}
+			}
+		}*/
+	</script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel='stylesheet' type='text/css' href="{% static 'homepage/css/index.css' %}">
+	<title>Homepage</title>
+</head>
+<body>
+	<div class="header">
+		<div class="inner-header">
+			<div class="name" style="float: none; width: 100%; text-align: center;">
+				<a href="{% url 'homepage' %}">
+					Elias Lucky
+				</a>
+			</div>
+		
+			<!--<ul class="pages">
+				<a class="button" href="{ url 'homepage' %}"><li>Home</li></a>
+				<a class="button" href="{ url 'classify' %}"><li>Classify</li></a>
+				<a class="button" href="{ url 'sandbox' %}"><li>Sandbox (Build your AI)</li></a>
+				<a class="button" href="{ url 'about:index' %}"><li>About</li></a>
+				<a class="button" href="{ url 'contacts:index' %}"><li>Contacts</li></a>
+			</ul>-->
+		</div>
+	</div>
+
+	<section id="choose">
+		<h2>Choose the challenge </h2>
+		<div class="btn2-section">
+			<div class="btn2">
+				<a class="orrey" href="{% url 'exoplanets_classifier' %}">
+					<p class="orrery-text"><span style="color: #e43700; font-weight: bold;"> NASA </span> SPACE APPS CHALLENGE </p>
+					<p class="orrery-text" style="font-size: 40px;"> 2025 </p>
+					<video lopp muted autoplay class="orrery-video">
+						<source src="{% static 'systems/videos/exoplanets.mp4' %}" type="video/mp4">
+					</video>
+					<p class="orrery-text"> EXOPLANETS AI CONSTRUCTOR </p>
+				</a>
+			</div>
+			<div class="btn2">
+				<a class="orrery" href="{% url 'planetary_constructor' %}">
+					<p class="orrery-text"><span style="color: #e43700; font-weight: bold;"> NASA </span> SPACE APPS CHALLENGE</p>
+					<p class="orrery-text" style="font-size: 40px;"> 2024 </p>
+					<video loop muted autoplay class="orrery-video">
+						<source src="{% static 'systems/videos/galaxy.mp4' %}" type="video/mp4">
+					</video>
+					<!--<img class="orrery-img" src="{% static 'systems/images/pause.png' %}">-->
+					<p class="orrery-text"> PLANETARY SYSTEMS CONSTRUCTOR </p>
+					<!--<p class="orrery-text">NASA SPACEAPPS CHALLENGE</p>
+					<p class="orrery-text" style="font-size: 40px"> 2024 </p>-->
+				</a>
+			</div>
+			<!--<div class="btn2">
+				<a class="orrery" href="{% url 'exoplanets_classifier' %}">
+					<p class="orrery-text"> <span style="color: #e43700; font-weight: bold;"> NASA </span> SPACE APPS CHALLENGE </p>
+					<p class="orrery-text" style="font-size: 40px;" > 2025 </p>
+					<video loop muted autoplay class="orrery-video">
+						<source src="{% static 'systems/videos/exoplanets.mp4' %}" type="video/mp4">
+					</video>-->
+					<!--<img class="orrery-img" src="{% static 'systems/images/pause.png' %}">-->
+			<!--		<p class="orrery-text"> EXOPLANETS AI CONSTRUCTOR </p>-->
+					<!--<p class="orrery-text">NASA SPACEAPPS CHALLENGE</p>
+					<p class="orrery-text" style="font-size: 40px"> 2025 </p>-->
+			<!--	</a>
+			</div>-->
+		</div>
+		<div class="fullscreen-bg">
+			<!--<video loop muted autoplay class="fullscreen-bg-video">
+				<source src="{% static 'homepage/videos/background2.mp4' %}" type="video/mp4">
+			</video>-->
+		</div>
+	</section>
+
+	<!--<div class="additional">
+		<p>Product by Elias Lucky created for NASA Space Apps Challenge 2024</p>
+	</div>-->
+</body>
+</html>

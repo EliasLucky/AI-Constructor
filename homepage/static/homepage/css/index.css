@@ -1,0 +1,233 @@
+*{
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	text-decoration: none;
+}
+
+@font-face {
+	font-family: "Nasa";
+	src: url("/static/homepage/fonts/nasalization-rg.otf")
+}
+
+.body {
+	position: relative;
+}
+
+.header {
+	position: absolute;
+	top: 0;
+	width: 100%;
+	height: 80px;
+	display: block;
+	background-color: transparent;
+}
+
+.inner-header {
+	height: 100%;
+	width: 1150px;
+	display: block;
+	margin: 0 auto;
+}
+
+.name {
+	height: 100%;
+	display: table;
+	float: left;
+}
+
+.name a {
+	font-size: 32px;
+	display: table-cell;
+	vertical-align: middle;
+	font-family: "Nasa";
+	color: white;
+}
+
+.pages {
+	height: 100%;
+	float: right;
+}
+
+.pages a {
+	height: 100%;
+	display: table;
+	float: left;
+	padding: 0px 20px;
+}
+
+.pages a:hover {
+	transition: 0.3s ease;
+	transform: scale(1.2) perspective(1px);
+}
+
+.pages a:active {
+	transition: 0.3s ease;
+	transform: scale(0.8) perspective(1px);
+}
+
+.pages a li {
+	display: table-cell;
+	vertical-align: middle;
+	height: 100%;
+	font-family: "Nasa";
+	color: white;
+	font-size: 20px;
+}
+
+.fullscreen-bg {
+	background-color: black;
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	overflow: hidden;
+	z-index: -100;
+}
+
+.fullscreen-bg-video {
+	position: absolute;
+	object-fit: cover;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+#home {
+	/*background-image: url('/static/homepage/images/background1.jpg');
+	background-size: cover;
+	background-position: center;*/
+	background-color: transparent;
+	width: 100%;
+	height: 100vh;
+	align-items: center;
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	font-family: "Nasa";
+}
+
+#home h2 {
+	color: white;
+	font-size: 25px;
+	padding: 5px 0px;
+	text-shadow: black 2px 2px 2px;
+}
+
+#home p {
+	display: none;
+	width: 50%;
+	color: white;
+	font-size: 18px;
+	line-height: 25px;
+	text-shadow: black 2px 2px 2px;
+}
+
+#home a {
+	font-size: 16px;
+	background-color: white;
+	border-radius: 5px;
+	padding: 13px 35px;
+}
+
+#home .btn {
+	margin-top: 30px;
+	font-weight: 660;
+}
+
+#home a.systems {
+	margin-right: 5px;
+	color: black;
+	background-color: white;
+}
+
+#home a.systems:hover {
+	color: rgb(11, 61, 145);
+	background-color: white;
+	transition: 0.3s ease
+}
+
+#home a.special {
+	background-color: #73bbf1;
+}
+/*
+.btn-special {
+	background-color: #2e7fbd;
+}*/
+
+.additional {
+	position: absolute;
+	margin: 15px;
+	bottom: 0px;
+	right: 0px;
+	background-color: transparent;
+	color: white;
+
+	/*font-family: "Nasa";*/
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+}
+
+.special2 {
+	object-fit: cover;
+}
+
+#choose {
+	background-color: transparent;
+	width: 100%;
+	height: 100vh;
+	align-items: center;
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	font-family: "Nasa";
+}
+
+#choose h2 {
+	color: white;
+	font-size: 25px;
+	padding: 5px 0px;
+	text-shadow: black 2px 2px 2px;
+}
+
+.btn2-section {
+	padding-top: 50px;
+	display: flex;
+	text-align: center;
+	align-items: center;
+	flex-direction: row;
+	justify-content: center;
+	gap: 40px;
+}
+
+.btn2 {
+	padding-left: 20px;
+	padding-right: 20px;
+}
+
+.orrery {
+	/*text-decoration-color: white;*/
+	color: white;
+	font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.orrery-video {
+	object-fit: contain;
+	width: 200px;
+	height: 200px;
+}
+
+.orrery-img {
+	width: 120px;
+	height: 120px;
+}
+
+.orrery-text {
+	color: white;
+	font-weight: bold;
+	font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif 
+}

@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel='stylesheet' type='text/css' href="{% static 'about/css/about.css' %}">
+	<title>About</title>
+</head>
+<body>
+	<div class="header">
+		<div class="inner-header">
+			<div class="name">
+				<a href="{% url 'homepage' %}">
+					AI Constructor
+				</a>
+			</div>
+		
+			<ul class="pages">
+				<a class="button" href="{% url 'homepage' %}"><li>Home</li></a>
+				<a class="button" href="{% url 'classify' %}"><li>Classify</li></a>
+				<a class="button" href="{% url 'sandbox' %}"><li>Sandbox <span style="font-size: 15px;">(BUILD YOUR AI)</span> </li></a>
+				<a class="button" href="{% url 'about' %}"><li>About</li></a>
+			</ul>
+		</div>
+	</div>
+
+	<div class="content">
+		<div class="about-videos">
+			<div class="about-video">
+				<video controls width="500">
+					<source src="{% static 'about/videos/exoplanets_promo.mp4' %}" type="video/mp4">
+				</video>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
